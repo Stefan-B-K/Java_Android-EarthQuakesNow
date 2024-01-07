@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.util.Consumer;
@@ -33,15 +34,13 @@ public class LocationService {
     public void runLocationUpdates(Consumer<Location> callback) {
         int granted = PackageManager.PERMISSION_GRANTED;
         if (ActivityCompat.checkSelfPermission(context, locationPerms[0]) != granted
-                && ActivityCompat.checkSelfPermission(context, locationPerms[1]) != granted) {
+                || ActivityCompat.checkSelfPermission(context, locationPerms[1]) != granted) {
 
             ActivityCompat.requestPermissions(context, locationPerms, 2);
             return;
         }
-
         LocationListener locationListener = callback::accept;
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 10, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 10, locationListener);
     }
 
 }

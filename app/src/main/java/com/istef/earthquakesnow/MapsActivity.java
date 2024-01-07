@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -47,12 +48,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fab.setOnClickListener(v -> showMyLocation());
 
         getMyLocation();
-        new DataPool(this).getDataList(this::handleEarthQuake);
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+        new DataPool(this).getDataList(earthQuake -> {
+            Marker marker = mMap.addMarker(markerOptions(earthQuake));
+            if (marker != null) marker.setTag(earthQuake.getDetail());
+        });
     }
 
     @Override
@@ -88,10 +92,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private void getMyLocation() {
-        new LocationService(this).runLocationUpdates(location ->
-                myPosition = new LatLng(
-                        location.getLatitude(),
-                        location.getLongitude()));
+        new LocationService(this).runLocationUpdates(location -> {
+            myPosition = new LatLng(
+                    location.getLatitude(),
+                    location.getLongitude());
+        });
     }
 
     private void showMyLocation() {
@@ -105,11 +110,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 13));
     }
 
+    public MarkerOptions markerOptions(EarthQuake earthQuake) {
+        float markerColor;
+        double mag = earthQuake.getMag();
 
-    private void handleEarthQuake(EarthQuake earthQuake) {
-        Marker marker = mMap.addMarker(earthQuake.markerOptions());
-        if (marker != null) marker.setTag(earthQuake.getDetail());
+        if (mag <= 3.0) {
+            markerColor = BitmapDescriptorFactory.HUE_YELLOW;
+        } else if (mag <= 5) {
+            markerColor = BitmapDescriptorFactory.HUE_ORANGE;
+        } else if (mag <= 6) {
+            markerColor = BitmapDescriptorFactory.HUE_RED;
+        } else {
+            markerColor = BitmapDescriptorFactory.HUE_VIOLET;
+        }
+        return new MarkerOptions()
+                .position(earthQuake.getPosition())
+                .title(earthQuake.getTitle())
+                .icon(BitmapDescriptorFactory.defaultMarker(markerColor));
     }
-
 
 }

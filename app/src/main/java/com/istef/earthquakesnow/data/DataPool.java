@@ -1,6 +1,10 @@
 package com.istef.earthquakesnow.data;
 
 import android.content.Context;
+import android.location.Location;
+import android.util.Log;
+
+import androidx.core.util.Consumer;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -22,16 +26,18 @@ public class DataPool {
         this.context = context;
     }
 
-    public void getDataList(final AsyncJsonResponse callback) {
+    public void getDataList(final Consumer<EarthQuake> callback) {
         String urlString = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson";
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, urlString, null,
                 response -> {
                     EarthquakeData eqData = gs.fromJson(String.valueOf(response), EarthquakeData.class);
                     earthQuakeList = Arrays.stream(eqData.getFeatures()).collect(Collectors.toList());
-
-                    if (callback != null) earthQuakeList.forEach(callback::handle);
+                    if (callback != null) {
+                        earthQuakeList.forEach(callback::accept);
+                    }
                 },
                 error -> {
+                    Log.e("===========", "getDataList ERROR: " + error.getLocalizedMessage());
                 });
         VolleySingleton.getInstance(context).addToRequestQueue(request);
     }

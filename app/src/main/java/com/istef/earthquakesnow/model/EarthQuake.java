@@ -62,7 +62,6 @@ public class EarthQuake {
 
     // Map properties
     private LatLng position;
-    private MarkerOptions markerOptions;
 
     public LatLng getPosition() {
         if (position != null) {
@@ -72,27 +71,4 @@ public class EarthQuake {
         return position;
     }
 
-    public MarkerOptions markerOptions() {
-        if (markerOptions != null) {
-            return markerOptions;
-        }
-        markerOptions = new MarkerOptions()
-                .position(getPosition())
-                .title(getTitle())
-                .icon(BitmapDescriptorFactory.defaultMarker(markerColor()));
-        return markerOptions;
-    }
-
-    private float markerColor() {
-        if (getMag() <= 3.0) {
-            return BitmapDescriptorFactory.HUE_YELLOW;
-        } else if (getMag() <= 5) {
-            return BitmapDescriptorFactory.HUE_ORANGE;
-        } else if (getMag() <= 6) {
-            return BitmapDescriptorFactory.HUE_RED;
-        } else {
-            return BitmapDescriptorFactory.HUE_VIOLET;
-        }
-
-    }
 }
