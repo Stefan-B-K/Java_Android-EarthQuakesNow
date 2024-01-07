@@ -6,8 +6,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.util.Log;
+import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.util.Consumer;
 
@@ -39,7 +40,26 @@ public class LocationService {
             ActivityCompat.requestPermissions(context, locationPerms, 2);
             return;
         }
-        LocationListener locationListener = callback::accept;
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                callback.accept(location);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+
+            }
+        };
+
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 10, locationListener);
     }
 

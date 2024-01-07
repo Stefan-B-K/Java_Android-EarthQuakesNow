@@ -6,7 +6,6 @@ import androidx.fragment.app.FragmentActivity;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -92,16 +91,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private void getMyLocation() {
-        new LocationService(this).runLocationUpdates(location -> {
-            myPosition = new LatLng(
-                    location.getLatitude(),
-                    location.getLongitude());
-        });
+        new LocationService(this).runLocationUpdates(location ->
+                myPosition = new LatLng(
+                        location.getLatitude(),
+                        location.getLongitude()));
     }
 
     private void showMyLocation() {
         if (myPosition == null) return;
-
         mMap.addMarker(new MarkerOptions()
                 .position(myPosition)
                 .title("My Location")
