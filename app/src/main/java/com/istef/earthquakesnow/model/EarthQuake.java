@@ -13,7 +13,7 @@ public class EarthQuake {
         private double mag;
         private String place;
         private long time;
-        private String detail;
+        private String url;
     }
 
     private class Geometry {
@@ -42,8 +42,8 @@ public class EarthQuake {
         return dateFormat.format(new Date(properties.time));
     }
 
-    public String getDetail() {
-        return properties.detail;
+    public String getUrl() {
+        return properties.url;
     }
 
     public double getLon() {

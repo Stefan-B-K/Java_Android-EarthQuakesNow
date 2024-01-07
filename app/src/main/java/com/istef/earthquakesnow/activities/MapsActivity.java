@@ -1,11 +1,16 @@
-package com.istef.earthquakesnow;
+package com.istef.earthquakesnow.activities;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -19,16 +24,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.istef.earthquakesnow.R;
 import com.istef.earthquakesnow.data.DataPool;
 import com.istef.earthquakesnow.databinding.ActivityMapsBinding;
 import com.istef.earthquakesnow.model.EarthQuake;
 import com.istef.earthquakesnow.services.LocationService;
+import com.istef.earthquakesnow.view.CustomInfoWindow;
 
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private LatLng myPosition;
+    private DataPool dataPool;
+    private GoogleMap.InfoWindowAdapter customInfoWindow;
 
 
     @Override
@@ -43,8 +53,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
-        FloatingActionButton fab = findViewById(R.id.fabLocation);
-        fab.setOnClickListener(v -> showMyLocation());
+        customInfoWindow = new CustomInfoWindow(this);
+        dataPool = new DataPool(this);
+
+        FloatingActionButton fabLocation = findViewById(R.id.fabLocation);
+        fabLocation.setOnClickListener(v -> showMyLocation());
+
+        FloatingActionButton fabList = findViewById(R.id.fabList);
+        fabList.setOnClickListener(v -> showMyLocation());
 
         getMyLocation();
     }
@@ -52,9 +68,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-        new DataPool(this).getDataList(earthQuake -> {
+
+        mMap.setOnMarkerClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
+
+        dataPool.getEarthQuakeList().forEach(earthQuake -> {
             Marker marker = mMap.addMarker(markerOptions(earthQuake));
-            if (marker != null) marker.setTag(earthQuake.getDetail());
+            if (marker != null) marker.setTag(earthQuake.getUrl());
         });
     }
 
@@ -99,11 +119,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void showMyLocation() {
         if (myPosition == null) return;
-        mMap.addMarker(new MarkerOptions()
+
+        Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(myPosition)
                 .title("My Location")
+                .snippet("Lat: " + myPosition.latitude + " Lon: " + myPosition.longitude)
                 .icon(BitmapDescriptorFactory
                         .defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+        if (marker != null) marker.setTag("myLocation");
+
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 13));
     }
 
@@ -111,19 +135,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float markerColor;
         double mag = earthQuake.getMag();
 
-        if (mag <= 3.0) {
+        if (mag <= 5.0) {
             markerColor = BitmapDescriptorFactory.HUE_YELLOW;
-        } else if (mag <= 5) {
-            markerColor = BitmapDescriptorFactory.HUE_ORANGE;
         } else if (mag <= 6) {
+            markerColor = BitmapDescriptorFactory.HUE_ORANGE;
+        } else if (mag <= 7) {
             markerColor = BitmapDescriptorFactory.HUE_RED;
         } else {
             markerColor = BitmapDescriptorFactory.HUE_VIOLET;
         }
         return new MarkerOptions()
                 .position(earthQuake.getPosition())
-                .title(earthQuake.getTitle())
+                .title(earthQuake.getPlace())
+                .snippet("Magnitude: " + earthQuake.getMag() + "\nDate: " + earthQuake.getTime())
                 .icon(BitmapDescriptorFactory.defaultMarker(markerColor));
     }
 
+    @Override
+    public void onInfoWindowClick(@NonNull Marker marker) {
+        if (marker.getTag().equals("myLocation")) return;
+
+        View view = getLayoutInflater().inflate(R.layout.detail_web, null);
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+        WebView webView = view.findViewById(R.id.wvDetail);
+        ImageButton btnClose = view.findViewById(R.id.btnClose);
+
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        webView.loadUrl(marker.getTag().toString());
+        btnClose.setOnClickListener(v -> alertDialog.dismiss());
+
+        alertDialog.show();
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        mMap.setInfoWindowAdapter(marker.getTag()
+                .equals("myLocation") ? null : customInfoWindow);
+
+        return false;
+    }
 }
