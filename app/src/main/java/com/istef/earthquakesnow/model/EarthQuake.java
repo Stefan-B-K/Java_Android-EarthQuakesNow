@@ -1,14 +1,14 @@
 package com.istef.earthquakesnow.model;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class EarthQuake {
-    private class Properties {
+public class EarthQuake implements Serializable {
+
+    private class Properties implements Serializable{
         private String title;
         private double mag;
         private String place;
@@ -16,7 +16,7 @@ public class EarthQuake {
         private String url;
     }
 
-    private class Geometry {
+    private class Geometry implements Serializable{
         private double[] coordinates;                                   // [ lon, lat, depth ]   ! ! !
     }
 
@@ -61,14 +61,8 @@ public class EarthQuake {
 
 
     // Map properties
-    private LatLng position;
-
     public LatLng getPosition() {
-        if (position != null) {
-            return position;
-        }
-        position = new LatLng(getLat(), getLon());
-        return position;
+        return new LatLng(getLat(), getLon());
     }
 
 }

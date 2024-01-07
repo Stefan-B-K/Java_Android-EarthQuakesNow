@@ -3,14 +3,10 @@ package com.istef.earthquakesnow.activities;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -29,7 +25,10 @@ import com.istef.earthquakesnow.data.DataPool;
 import com.istef.earthquakesnow.databinding.ActivityMapsBinding;
 import com.istef.earthquakesnow.model.EarthQuake;
 import com.istef.earthquakesnow.services.LocationService;
-import com.istef.earthquakesnow.view.CustomInfoWindow;
+import com.istef.earthquakesnow.adapter.CustomInfoWindowAdapter;
+import com.istef.earthquakesnow.util.Config;
+
+import java.io.Serializable;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -53,17 +52,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
-        customInfoWindow = new CustomInfoWindow(this);
+        customInfoWindow = new CustomInfoWindowAdapter(this);
         dataPool = new DataPool(this);
 
         FloatingActionButton fabLocation = findViewById(R.id.fabLocation);
         fabLocation.setOnClickListener(v -> showMyLocation());
 
         FloatingActionButton fabList = findViewById(R.id.fabList);
-        fabList.setOnClickListener(v -> showMyLocation());
+        fabList.setOnClickListener(v -> showMQuakeList());
 
         getMyLocation();
     }
+
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -151,24 +151,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .icon(BitmapDescriptorFactory.defaultMarker(markerColor));
     }
 
+    private void showMQuakeList() {
+        Intent intent = new Intent(this, QuakeListActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("earthquakeList", (Serializable) dataPool.getEarthQuakeList());
+        intent.putExtras(bundle);
+        startActivity(intent);
+//        finish();
+    }
+
+
+
     @Override
     public void onInfoWindowClick(@NonNull Marker marker) {
         if (marker.getTag().equals("myLocation")) return;
 
-        View view = getLayoutInflater().inflate(R.layout.detail_web, null);
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setView(view)
-                .create();
-        WebView webView = view.findViewById(R.id.wvDetail);
-        ImageButton btnClose = view.findViewById(R.id.btnClose);
-
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-
-        webView.loadUrl(marker.getTag().toString());
-        btnClose.setOnClickListener(v -> alertDialog.dismiss());
-
-        alertDialog.show();
+        Config.showWebDetail(this, marker.getTag().toString());
     }
 
     @Override

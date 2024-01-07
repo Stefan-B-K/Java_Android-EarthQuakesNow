@@ -1,4 +1,4 @@
-package com.istef.earthquakesnow.view;
+package com.istef.earthquakesnow.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,11 +12,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 import com.istef.earthquakesnow.R;
 
-public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
+public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     private final View view;
 
 
-    public CustomInfoWindow(Context context) {
+    public CustomInfoWindowAdapter(Context context) {
         view = LayoutInflater.from(context).inflate(R.layout.custom_info_window, null);
     }
 
