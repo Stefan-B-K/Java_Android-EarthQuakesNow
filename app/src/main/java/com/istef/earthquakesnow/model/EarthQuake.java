@@ -54,7 +54,6 @@ public class EarthQuake implements Serializable {
         return geometry.coordinates[1];
     }
 
-    // km
     public double getDepth() {
         return geometry.coordinates[2];
     }

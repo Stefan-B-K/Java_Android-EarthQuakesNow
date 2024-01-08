@@ -9,7 +9,7 @@ import android.widget.ImageButton;
 
 import com.istef.earthquakesnow.R;
 
-public class Config {
+public class CommonUI {
 
     public static void showWebDetail(Activity context, String url) {
 

@@ -26,7 +26,7 @@ import com.istef.earthquakesnow.databinding.ActivityMapsBinding;
 import com.istef.earthquakesnow.model.EarthQuake;
 import com.istef.earthquakesnow.services.LocationService;
 import com.istef.earthquakesnow.adapter.CustomInfoWindowAdapter;
-import com.istef.earthquakesnow.util.Config;
+import com.istef.earthquakesnow.util.CommonUI;
 
 import java.io.Serializable;
 
@@ -166,7 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onInfoWindowClick(@NonNull Marker marker) {
         if (marker.getTag().equals("myLocation")) return;
 
-        Config.showWebDetail(this, marker.getTag().toString());
+        CommonUI.showWebDetail(this, marker.getTag().toString());
     }
 
     @Override

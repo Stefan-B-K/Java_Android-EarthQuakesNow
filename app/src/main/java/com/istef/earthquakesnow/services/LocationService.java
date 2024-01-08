@@ -40,6 +40,7 @@ public class LocationService {
             ActivityCompat.requestPermissions(context, locationPerms, 2);
             return;
         }
+
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
@@ -56,7 +57,6 @@ public class LocationService {
 
             @Override
             public void onProviderDisabled(@NonNull String provider) {
-
             }
         };
 

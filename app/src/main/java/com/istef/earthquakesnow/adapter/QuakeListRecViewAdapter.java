@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.istef.earthquakesnow.R;
 import com.istef.earthquakesnow.model.EarthQuake;
-import com.istef.earthquakesnow.util.Config;
+import com.istef.earthquakesnow.util.CommonUI;
 
 import java.util.List;
 
 public class QuakeListRecViewAdapter extends RecyclerView.Adapter<QuakeListRecViewAdapter.ViewHolder>{
 
     private final Activity context;
-    private List<EarthQuake> earthQuakeList;
+    private final List<EarthQuake> earthQuakeList;
 
     public QuakeListRecViewAdapter(Activity context, List<EarthQuake> earthQuakeList) {
         this.context = context;
@@ -53,7 +53,7 @@ public class QuakeListRecViewAdapter extends RecyclerView.Adapter<QuakeListRecVi
             txtQuake = itemView.findViewById(R.id.txtQuakeRowTitle);
             txtQuake.setOnClickListener(v -> {
                 String url = earthQuakeList.get(getAdapterPosition()).getUrl();
-                Config.showWebDetail(context, url);
+                CommonUI.showWebDetail(context, url);
             });
         }
     }
