@@ -52,8 +52,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+        dataPool = new DataPool();
+        dataPool.fetchEarthquakeData(this);
+
         customInfoWindow = new CustomInfoWindowAdapter(this);
-        dataPool = new DataPool(this);
 
         FloatingActionButton fabLocation = findViewById(R.id.fabLocation);
         fabLocation.setOnClickListener(v -> showMyLocation());
